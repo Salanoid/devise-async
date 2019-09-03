@@ -19,7 +19,7 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
 
 
-  gem.add_dependency "devise", ">= 3.2", "<= 4.5"
+  gem.add_dependency "devise", ">= 3.2", "<= 4.7"
 
   gem.add_development_dependency "minitest",                  ">= 3.0"
   gem.add_development_dependency "activerecord",              ">= 4.0"
