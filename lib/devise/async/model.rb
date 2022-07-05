@@ -40,6 +40,7 @@ module Devise
         # If the record isn't dirty (aka has already been saved) enqueue right away
         # because the callback has already been triggered.
         else
+          args = stringify_locale_args(args)
           Devise::Async::Worker.enqueue(notification.to_s, self.class.name, self.id.to_s, *args)
         end
       end
@@ -49,6 +50,7 @@ module Devise
         devise_pending_notifications.each do |notification, args|
           # Use `id.to_s` to avoid problems with mongoid 2.4.X ids being serialized
           # wrong with YAJL.
+          args = stringify_locale_args(args)
           Devise::Async::Worker.enqueue(notification.to_s, self.class.name, self.id.to_s, *args)
         end
         @devise_pending_notifications = []
@@ -73,7 +75,17 @@ module Devise
         opts['locale'] = I18n.locale
         args.push(opts)
       end
+     
+      def stringify_locale_args(args)
+        args.each_with_object([]) do |a, acc|
+          arg = is_arg_locale?(a) ? a.deep_merge(a) {|_,_,v| v.to_s} : a
+          acc << arg
+        end
+      end
 
+      def is_arg_locale?(arg)
+        arg.present? && arg.is_a?(Hash) && arg['locale'].present? 
+      end
     end
   end
 end
